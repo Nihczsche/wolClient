@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final pubKey = RSAKeyParser().parse(await loadPubKey()) as RSAPublicKey;
     final encrypter = Encrypter(RSA(publicKey: pubKey));
 
-    jsonData['macAddr'] = macAddr.split(":").map((String k) {int.parse(k, radix: 16);}).toList();
+    jsonData['macAddr'] = macAddr.split(":").map((String k) {return int.parse(k, radix: 16);}).toList();
     jsonData['repeatNum'] = 3;
     jsonData['salt'] = nouns[Random().nextInt(nouns.length)];
     jsonData['datetime'] = timeNow.toIso8601String();
@@ -103,7 +103,6 @@ class _MyHomePageState extends State<MyHomePage> {
       svrAddr = 'http://' + svrAddr;
     }
 
-    
     try
     {
       HttpClientRequest request = await HttpClient().postUrl(Uri.parse(svrAddr))
@@ -115,13 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
     
       _displaySnackBar(context, 'Server: ' + respString);
     }
-    on TimeoutException catch(e)
+    catch(e)
     {
-      _displaySnackBar(context, 'Timeout: ' + e.toString());
-    }
-    on SocketException catch(e)
-    {
-      _displaySnackBar(context, 'Socket: ' + e.toString());
+      _displaySnackBar(context, 'Error: ' + e.toString());
     }
 
   }
@@ -503,7 +498,7 @@ class _AddWOLEntryPageState extends State<AddWOLEntryPage> {
                               {
                                 try {
                                   var n = int.parse(value);
-                                  if(n < 0 || n > 65536){
+                                  if(n < 0 || n > 65535){
                                     return '';
                                   }
                                 } on FormatException {
@@ -518,7 +513,6 @@ class _AddWOLEntryPageState extends State<AddWOLEntryPage> {
                     ),
                   ),
                   new RaisedButton(onPressed: (){
-                      //sendJsonReq();
                       if (_formKey.currentState.validate()) {
                         // If the form is valid, display a Snackbar.
                         FocusScopeNode currentFocus = FocusScope.of(context);
